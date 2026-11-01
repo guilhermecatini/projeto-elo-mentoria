@@ -1,0 +1,15 @@
+import {config} from 'dotenv';
+import {spawn} from 'node:child_process';
+import {resolve} from 'node:path';
+config({path:resolve('.env'),quiet:true});
+const action=process.argv[2];
+const commands={api:['node_modules/tsx/dist/cli.mjs','apps/api/src/main.ts'],worker:['node_modules/tsx/dist/cli.mjs','apps/api/src/worker.ts'],migrate:['node_modules/tsx/dist/cli.mjs','apps/api/src/cli.ts','migrate'],seed:['node_modules/tsx/dist/cli.mjs','apps/api/src/cli.ts','seed'],web:['node_modules/vite/bin/vite.js','--host','127.0.0.1','--port','5173']};
+if(!commands[action])throw new Error('Use node scripts/dev.mjs api|worker|migrate|seed|web');
+const database=process.env.TEST_DATABASE_NAME||'elo';
+if(!/^[a-z_]+$/.test(database))throw new Error('Nome do banco inválido');
+const env={...process.env,NODE_ENV:'development',DATABASE_URL:`postgresql://elo_app:${process.env.DB_APP_PASSWORD}@127.0.0.1:55432/${database}`,MIGRATION_DATABASE_URL:`postgresql://elo_owner:${process.env.DB_OWNER_PASSWORD}@127.0.0.1:55432/${database}`,REDIS_URL:`redis://:${process.env.REDIS_PASSWORD}@127.0.0.1:56379/${process.env.TEST_REDIS_DB||0}`,APP_ORIGIN:process.env.DEV_APP_ORIGIN||'http://localhost:5173'};
+const args=commands[action].map((a,i)=>i===0?resolve(a):a);
+if(action!=='web')args.splice(1,0,'--tsconfig',resolve('apps/api/tsconfig.json'));
+const child=spawn(process.execPath,args,{env,stdio:'inherit',cwd:action==='web'?resolve('apps/web'):process.cwd()});
+for(const signal of ['SIGINT','SIGTERM'])process.on(signal,()=>child.kill(signal));
+child.on('exit',code=>process.exit(code??1));

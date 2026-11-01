@@ -1,0 +1,50 @@
+exports.up = async function (k) {
+  await k.schema.createTable('indicators', t => {
+    t.uuid('id').primary(); t.uuid('organization_id').notNullable(); t.uuid('enrollment_id').notNullable();
+    t.uuid('created_by').notNullable(); t.text('period').notNullable();
+    t.text('source_type').notNullable().defaultTo('manual'); t.jsonb('draft').notNullable();
+    t.integer('draft_version').notNullable().defaultTo(1); t.integer('published_version').notNullable().defaultTo(0);
+    t.text('status').notNullable().defaultTo('draft'); t.text('archive_reason'); t.uuid('archived_by'); t.timestamp('archived_at', {useTz: true});
+    t.timestamp('created_at', {useTz: true}).notNullable().defaultTo(k.fn.now());
+    t.timestamp('updated_at', {useTz: true}).notNullable().defaultTo(k.fn.now());
+    t.foreign(['organization_id', 'enrollment_id']).references(['organization_id', 'id']).inTable('enrollments');
+    for (const field of ['created_by', 'archived_by']) t.foreign(['organization_id', field]).references(['organization_id', 'id']).inTable('users');
+    t.unique(['organization_id', 'id']); t.unique(['organization_id', 'id', 'enrollment_id']);
+    t.unique(['enrollment_id', 'period']);
+    t.check("period ~ '^[0-9]{4}-(0[1-9]|1[0-2])$'");
+    t.check("source_type in ('manual','csv','sync')"); t.check("status in ('draft','published','archived')");
+    t.check('draft_version > 0 AND published_version >= 0'); t.check("jsonb_typeof(draft) = 'object'");
+    t.index(['organization_id', 'enrollment_id', 'status']);
+  });
+  await k.schema.createTable('indicator_revisions', t => {
+    t.uuid('id').primary(); t.uuid('organization_id').notNullable(); t.uuid('indicator_id').notNullable(); t.uuid('enrollment_id').notNullable();
+    t.integer('version').notNullable(); t.integer('source_draft_version').notNullable(); t.text('period').notNullable();
+    t.jsonb('snapshot').notNullable(); t.text('snapshot_hash').notNullable(); t.uuid('published_by').notNullable();
+    t.timestamp('published_at', {useTz: true}).notNullable().defaultTo(k.fn.now());
+    t.foreign(['organization_id', 'indicator_id', 'enrollment_id']).references(['organization_id', 'id', 'enrollment_id']).inTable('indicators');
+    t.foreign(['organization_id', 'published_by']).references(['organization_id', 'id']).inTable('users');
+    t.unique(['indicator_id', 'version']); t.unique(['organization_id', 'id', 'enrollment_id']);
+    t.check('version > 0 AND source_draft_version > 0'); t.check("snapshot_hash ~ '^[a-f0-9]{64}$'");
+  });
+  await k.schema.createTable('indicator_goals', t => {
+    t.uuid('id').primary(); t.uuid('organization_id').notNullable(); t.uuid('enrollment_id').notNullable(); t.uuid('created_by').notNullable();
+    t.text('period').notNullable(); t.text('metric_key').notNullable(); t.text('target').notNullable();
+    t.text('direction').notNullable(); t.uuid('plan_id'); t.text('notes').notNullable().defaultTo('');
+    t.integer('version').notNullable().defaultTo(1); t.text('status').notNullable().defaultTo('active');
+    t.text('archive_reason'); t.uuid('archived_by'); t.timestamp('archived_at', {useTz: true});
+    t.timestamp('created_at', {useTz: true}).notNullable().defaultTo(k.fn.now());
+    t.timestamp('updated_at', {useTz: true}).notNullable().defaultTo(k.fn.now());
+    t.foreign(['organization_id', 'enrollment_id']).references(['organization_id', 'id']).inTable('enrollments');
+    t.foreign(['organization_id', 'plan_id', 'enrollment_id']).references(['organization_id', 'id', 'enrollment_id']).inTable('action_plans');
+    for (const field of ['created_by', 'archived_by']) t.foreign(['organization_id', field]).references(['organization_id', 'id']).inTable('users');
+    t.unique(['organization_id', 'id']); t.unique(['enrollment_id', 'period', 'metric_key']);
+    t.check("period ~ '^[0-9]{4}-(0[1-9]|1[0-2])$'"); t.check("direction in ('at_least','at_most')");
+    t.check("status in ('active','archived')"); t.check('version > 0');
+    t.check("target ~ '^[-]{0,1}[0-9]+([.][0-9]{1,4}){0,1}$'");
+    t.check("metric_key in ('revenue','orders','visits','adSpend','attributedRevenue','totalCosts','claims','cancellations','lateShipments','skuCount','outOfStockSkus','activeListings','completeListings','averageTicket','conversionRate','roas','acos','tacos','estimatedMargin')");
+    t.check("target::numeric between -1000000000000 and 1000000000000 AND (metric_key = 'estimatedMargin' OR target::numeric >= 0)");
+    t.index(['organization_id', 'enrollment_id', 'status']); t.index(['organization_id', 'plan_id']);
+  });
+  await k.raw("DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname='elo_app') THEN GRANT SELECT,INSERT,UPDATE,DELETE ON indicators,indicator_revisions,indicator_goals TO elo_app; END IF; END $$");
+};
+exports.down = async function () { throw new Error('Preserve os indicadores e suas revisões. Restaure o backup em ambiente isolado.'); };

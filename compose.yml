@@ -1,0 +1,140 @@
+name: elo-mentoria
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: 10m
+    max-file: '3'
+x-api-environment: &api-environment
+  NODE_ENV: ${NODE_ENV:-production}
+  PORT: '3333'
+  DATABASE_URL: postgresql://elo_app:${DB_APP_PASSWORD:?Configure DB_APP_PASSWORD}@db:5432/elo
+  REDIS_URL: redis://:${REDIS_PASSWORD:?Configure REDIS_PASSWORD}@redis:6379
+  APP_ORIGIN: ${APP_ORIGIN:?Configure APP_ORIGIN}
+  SESSION_SECRET: ${SESSION_SECRET:?Configure SESSION_SECRET}
+  ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+  ADMIN_NAME: ${ADMIN_NAME:-Administrador}
+  UPLOAD_DIR: /app/uploads
+  INTEGRATION_ORGANIZATION_ID: ${INTEGRATION_ORGANIZATION_ID:-}
+  ML_CLIENT_ID: ${ML_CLIENT_ID:-}
+  ML_CLIENT_SECRET: ${ML_CLIENT_SECRET:-}
+  ML_REDIRECT_URI: ${ML_REDIRECT_URI:-}
+  WHATSAPP_ACCESS_TOKEN: ${WHATSAPP_ACCESS_TOKEN:-}
+  WHATSAPP_PHONE_NUMBER_ID: ${WHATSAPP_PHONE_NUMBER_ID:-}
+  WHATSAPP_BUSINESS_ACCOUNT_ID: ${WHATSAPP_BUSINESS_ACCOUNT_ID:-}
+  WHATSAPP_APP_SECRET: ${WHATSAPP_APP_SECRET:-}
+  WHATSAPP_VERIFY_TOKEN: ${WHATSAPP_VERIFY_TOKEN:-}
+  WHATSAPP_API_VERSION: ${WHATSAPP_API_VERSION:-}
+  RESEND_API_KEY: ${RESEND_API_KEY:-}
+  RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-}
+  RESEND_WEBHOOK_SECRET: ${RESEND_WEBHOOK_SECRET:-}
+services:
+  db:
+    image: pgvector/pgvector:0.8.7-pg18-bookworm@sha256:2358fcba361ed2233a5ed81b5fe4ca779ccb304120ce531a3bf51c0ed7e2bc11
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: elo
+      POSTGRES_USER: elo_owner
+      POSTGRES_PASSWORD: ${DB_OWNER_PASSWORD:?Configure DB_OWNER_PASSWORD}
+      DB_APP_PASSWORD: ${DB_APP_PASSWORD:?Configure DB_APP_PASSWORD}
+    volumes:
+      - database:/var/lib/postgresql
+      - ./infra/postgres-init.sh:/docker-entrypoint-initdb.d/10-app-role.sh:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U elo_owner -d elo']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [internal]
+    logging: *logging
+  redis:
+    image: redis:7.4.6-alpine
+    command: ['sh', '-c', 'exec redis-server --appendonly yes --requirepass "$$REDIS_PASSWORD"']
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?Configure REDIS_PASSWORD}
+      REDISCLI_AUTH: ${REDIS_PASSWORD:?Configure REDIS_PASSWORD}
+    restart: unless-stopped
+    volumes: [redis:/data]
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [internal]
+    logging: *logging
+  migrate:
+    image: elo-mentoria-api:${APP_VERSION:-local}
+    build: {context: ., target: api}
+    profiles: [tools]
+    environment:
+      <<: *api-environment
+      MIGRATION_DATABASE_URL: postgresql://elo_owner:${DB_OWNER_PASSWORD:?Configure DB_OWNER_PASSWORD}@db:5432/elo
+    command: ['node', 'apps/api/dist/cli.js', 'migrate']
+    depends_on:
+      db: {condition: service_healthy}
+    networks: [internal]
+    logging: *logging
+  api:
+    image: elo-mentoria-api:${APP_VERSION:-local}
+    build: {context: ., target: api}
+    init: true
+    restart: unless-stopped
+    environment: *api-environment
+    depends_on:
+      db: {condition: service_healthy}
+      redis: {condition: service_healthy}
+    volumes: [uploads:/app/uploads]
+    healthcheck:
+      test: ['CMD', 'node', '-e', "fetch('http://127.0.0.1:3333/api/health/live').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    stop_grace_period: 30s
+    networks: [internal]
+    logging: *logging
+  worker:
+    image: elo-mentoria-api:${APP_VERSION:-local}
+    build: {context: ., target: api}
+    init: true
+    restart: unless-stopped
+    environment: *api-environment
+    command: ['node', 'apps/api/dist/worker.js']
+    depends_on:
+      db: {condition: service_healthy}
+      redis: {condition: service_healthy}
+    healthcheck:
+      test: ['CMD', 'node', 'apps/api/dist/cli.js', 'worker-health']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    stop_grace_period: 30s
+    networks: [internal]
+    logging: *logging
+  frontend:
+    image: elo-mentoria-frontend:${APP_VERSION:-local}
+    build: {context: ., target: frontend}
+    restart: unless-stopped
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-localhost}
+    ports: ['${HTTP_BIND:-0.0.0.0}:80:80', '${HTTPS_BIND:-0.0.0.0}:443:443']
+    depends_on:
+      api: {condition: service_healthy}
+    volumes: [caddy_data:/data, caddy_config:/config]
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -q -O /dev/null http://127.0.0.1:2019/config/ || exit 1']
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    networks: [internal, public]
+    logging: *logging
+networks:
+  internal:
+    internal: true
+  public: {}
+volumes:
+  database: {}
+  redis: {}
+  uploads: {}
+  caddy_data: {}
+  caddy_config: {}

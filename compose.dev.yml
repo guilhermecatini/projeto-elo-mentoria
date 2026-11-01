@@ -1,0 +1,23 @@
+services:
+  db:
+    ports: ['127.0.0.1:55432:5432']
+  redis:
+    ports: ['127.0.0.1:56379:6379']
+  api:
+    environment:
+      NODE_ENV: development
+    ports: ['127.0.0.1:3333:3333']
+  worker:
+    environment:
+      NODE_ENV: development
+  migrate:
+    environment:
+      NODE_ENV: development
+      DEMO_PASSWORD: ${DEMO_PASSWORD:-}
+  frontend:
+    environment:
+      SITE_ADDRESS: ':80'
+    ports: !override ['127.0.0.1:18088:80']
+networks:
+  internal:
+    internal: false

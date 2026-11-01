@@ -1,0 +1,13 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {addBusinessMinutes,businessMinutesBetween,defaultCalendar} from '../src/calendar';
+test('sexta-feira após expediente: quatro horas úteis terminam segunda às 13h',()=>{assert.equal(addBusinessMinutes('2026-10-30T22:00:00Z',240).toISOString(),'2026-11-02T16:00:00.000Z');});
+test('feriados são pulados no calendário do programa',()=>{assert.equal(addBusinessMinutes('2026-10-30T20:00:00Z',120,{...defaultCalendar,holidays:['2026-11-02']}).toISOString(),'2026-11-03T13:00:00.000Z');});
+test('minutos úteis ignoram noite e fim de semana',()=>{assert.equal(businessMinutesBetween('2026-10-30T20:00:00Z','2026-11-02T13:00:00Z'),120);});
+test('75% é medido em minutos úteis',()=>{const start='2026-10-30T19:00:00Z',due=addBusinessMinutes(start,240);assert.equal(businessMinutesBetween(start,'2026-11-02T13:00:00Z')/businessMinutesBetween(start,due),.75);});
+test('calendário inválido não bloqueia worker em loop',()=>{assert.throws(()=>addBusinessMinutes(new Date(),10,{...defaultCalendar,days:[]}));});
+test('prazo termina exatamente no fechamento sem pular um dia',()=>{assert.equal(addBusinessMinutes('2026-10-30T20:00:00Z',60).toISOString(),'2026-10-30T21:00:00.000Z');});
+test('abertura e meia-noite são normalizadas para o horário local',()=>{assert.equal(addBusinessMinutes('2026-10-30T04:00:00Z',60).toISOString(),'2026-10-30T13:00:00.000Z');});
+test('mudança de horário de verão respeita calendário local em outro fuso',()=>{const c={...defaultCalendar,timezone:'America/New_York'};assert.equal(addBusinessMinutes('2026-03-06T22:00:00Z',120,c).toISOString(),'2026-03-09T14:00:00.000Z');});
+test('feriados consecutivos e finais de semana não consomem prazo',()=>{const c={...defaultCalendar,holidays:['2026-11-02','2026-11-03']};assert.equal(addBusinessMinutes('2026-10-30T21:00:00Z',60,c).toISOString(),'2026-11-04T13:00:00.000Z');});
+test('intervalos totalmente fora do expediente têm zero minutos úteis',()=>{assert.equal(businessMinutesBetween('2026-10-30T22:00:00Z','2026-11-02T11:00:00Z'),0);});

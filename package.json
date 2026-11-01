@@ -1,0 +1,30 @@
+{
+  "name": "elo-mentoria",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "engines": {"node": ">=24 <25"},
+  "overrides": {"multer": "2.5.0"},
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "dev:api": "node scripts/dev.mjs api",
+    "dev:web": "node scripts/dev.mjs web",
+    "dev:worker": "node scripts/dev.mjs worker",
+    "db:migrate": "node scripts/dev.mjs migrate",
+    "db:seed": "node scripts/dev.mjs seed",
+    "test:acceptance": "npm run build -w @mentoria/api && node tests/run-acceptance.mjs",
+    "test:security": "npm run build -w @mentoria/api && node --test tests/auth-security.mjs",
+    "test:plans": "npm run build -w @mentoria/api && node --test tests/plans-acceptance.mjs",
+    "test:attachments": "npm run build -w @mentoria/api && node --test tests/attachments-acceptance.mjs",
+    "test:meetings": "npm run build -w @mentoria/api && node --test tests/meetings-acceptance.mjs",
+    "test:diagnostics": "npm run build -w @mentoria/api && node --test tests/diagnostics-acceptance.mjs",
+    "test:indicators": "npm run build -w @mentoria/api && node --test tests/indicators-acceptance.mjs",
+    "test:indicator-imports": "npm run build -w @mentoria/api && node --test tests/indicator-imports-acceptance.mjs",
+    "test:commercial": "npm run build -w @mentoria/api && node --test tests/commercial-acceptance.mjs",
+    "test:journey": "npm run build -w @mentoria/api && node --test tests/journey-acceptance.mjs",
+    "test:materials": "npm run build -w @mentoria/api && node --test tests/materials-acceptance.mjs",
+    "test:reports": "npm run build -w @mentoria/api && node --test tests/reports-acceptance.mjs",
+    "test:integrations": "npm run build -w @mentoria/api && node --test tests/integrations-acceptance.mjs"
+  }
+}

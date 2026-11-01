@@ -1,0 +1,7 @@
+Roteiro de conferência do catálogo — arquivo de validação
+
+1. Conferir marca, modelo e dimensões dos produtos.
+2. Comparar as fotos com a variação anunciada.
+3. Registrar diferenças e encaminhar para revisão do mentor.
+
+Este arquivo contém somente dados de demonstração para testar o anexo privado.

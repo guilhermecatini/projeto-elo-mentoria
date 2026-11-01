@@ -1,0 +1,20 @@
+{$SITE_ADDRESS:localhost} {
+  encode zstd gzip
+  header {
+    X-Content-Type-Options nosniff
+    Referrer-Policy strict-origin-when-cross-origin
+    X-Frame-Options DENY
+    -Server
+  }
+  handle /api/* {
+    request_body {
+      max_size 11MB
+    }
+    reverse_proxy api:3333
+  }
+  handle {
+    root * /srv
+    try_files {path} /index.html
+    file_server
+  }
+}

@@ -1,0 +1,7 @@
+FROM docker:cli@sha256:6fae2214c3121a28d5aa639d09032f61310b7c9c75ffbad1025f261a1b621800 AS dockercli
+FROM ubuntu:24.04@sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3
+RUN apt-get update -q && apt-get install -y --no-install-recommends bash coreutils util-linux tar gzip ca-certificates curl && rm -rf /var/lib/apt/lists/*
+COPY --from=dockercli /usr/local/bin/docker /usr/local/bin/docker
+COPY --from=dockercli /usr/local/libexec/docker/cli-plugins/docker-compose /usr/local/libexec/docker/cli-plugins/docker-compose
+COPY infra/operations-test.sh /operations-test.sh
+ENTRYPOINT ["bash", "/operations-test.sh"]
