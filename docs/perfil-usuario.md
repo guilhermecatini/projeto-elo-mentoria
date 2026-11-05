@@ -27,7 +27,22 @@ Auditoria não contém senha, hash, token, código TOTP ou bytes da foto.
 O novo e-mail entra em vigor após a reautenticação. Esta versão não envia confirmação
 automática por e-mail; o formulário e o manual orientam a conferir o endereço.
 
-## Fotos privadas
+## Recorte e exibição de fotos
+
+Antes de enviar, a pessoa ajusta a foto em um diálogo com arraste, zoom de 1× a
+4×, reposicionamento por teclado, redefinição e prévia circular. “Usar este recorte”
+prepara um WEBP quadrado local; “Salvar foto” confirma o envio. É possível reajustar
+o recorte enquanto a seleção não foi salva. Cancelar preserva a seleção anterior.
+O original fica apenas na memória do navegador e é liberado ao descartar/salvar.
+A imagem quadrada enviada já contém o enquadramento escolhido; o servidor a
+valida e regrava antes de persistir.
+
+A foto acompanha a identidade nas mensagens públicas e internas autorizadas,
+responsáveis, participantes, carteiras, mentores, administração e históricos.
+Empresas mantêm sua identificação própria. Sem foto, ou se ela não puder ser
+carregada, aparecem as iniciais. Seletores nativos preservam os nomes em texto.
+
+## Armazenamento e acesso
 
 Entradas: PNG, JPEG ou WEBP estático, até 2 MiB e 20 megapixels. A assinatura e o tipo
 são conferidos antes da decodificação. Sharp decodifica, orienta, recorta e limita a
@@ -38,9 +53,15 @@ processamentos simultâneos. A biblioteca está fixada em `sharp@0.35.5`; refer�
 
 O original não é armazenado. O WEBP tem até 256 KiB e fica em `user_avatars`, com
 vínculo composto de organização/pessoa e restrições no banco. O backup PostgreSQL já
-inclui esse conteúdo. A imagem serve somente à própria conta autenticada, em
-`/api/profile/avatar`, com `private, no-store`; não há endereço público ou diretório
-de fotos. A remoção apaga a imagem atual e preserva o contador de versão e a auditoria.
+inclui esse conteúdo. A própria conta usa `/api/profile/avatar`. As demais
+identificações recebem `/api/people/:id/avatar` com assinatura vinculada à pessoa
+que consulta, organização, papel, contexto autorizado e versão da foto. Conhecer
+um UUID ou copiar a URL para outra conta não concede acesso. Cada leitura verifica
+novamente a carteira/atendimento/material ou permissão administrativa; avaliações
+revalidam também o compartilhamento. Apenas IDs e nomes de DTOs controlados pelo
+servidor recebem URLs: rascunhos, conteúdo e detalhes livres da auditoria não são
+interpretados como pessoas. As imagens usam `private, no-store`; não há endereço
+público ou diretório de fotos. A remoção apaga a imagem atual e preserva o contador de versão e a auditoria.
 As iniciais continuam como alternativa quando não existe foto.
 
 ## Rotas
@@ -54,6 +75,7 @@ As iniciais continuam como alternativa quando não existe foto.
 | POST | `/api/profile/avatar?expectedVersion=N` | Multipart `file` com foto |
 | DELETE | `/api/profile/avatar?expectedVersion=N` | Remover foto própria |
 | GET | `/api/profile/avatar` | WEBP privado da pessoa conectada |
+| GET | `/api/people/:id/avatar` | WEBP de identidade autorizada, com contexto e assinatura |
 
 ## Verificação
 
@@ -62,3 +84,10 @@ contas da instalação local. Verifica os três perfis, CSRF, origem, dados estr
 concorrência, versões, validação/remoção de imagem, MFA, sessão atual, outros acessos,
 links antigos e login com espaços significativos na senha. Testes unitários de
 validação e imagem estão em `apps/api/test/profile.test.ts`.
+
+
+`npm run test:avatars` usa `elo_avatarscheck`, API 3348 e Redis DB15 para verificar
+fotos em mensagens, carteiras, tarefas, participantes e históricos, isolamento entre
+contas/organizações, adulteração de URL, retirada de compartilhamento, visibilidade
+de materiais, transferência de carteira, troca/remoção de foto e dados livres da
+auditoria. A geometria do recorte é testada em `apps/web/test/photo-crop.test.ts`.

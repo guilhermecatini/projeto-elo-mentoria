@@ -203,7 +203,7 @@ export class DiagnosticsService {
       result.updatedAt = row.updated_at;
       result.history = await db('audit_events as a').leftJoin('users as u', 'u.id', 'a.actor_id')
         .where({'a.organization_id': user.organizationId, 'a.entity_type': 'diagnosis', 'a.entity_id': id})
-        .select('a.id', 'a.action', 'a.details', 'a.created_at as createdAt', 'u.name as actorName').orderBy('a.created_at', 'desc').limit(200);
+        .select('a.id', 'a.action', 'a.details', 'a.created_at as createdAt', 'a.actor_id as actorId', 'u.name as actorName').orderBy('a.created_at', 'desc').limit(200);
     }
     return result;
   }

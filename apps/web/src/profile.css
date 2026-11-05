@@ -44,6 +44,23 @@
 .account-security-section form > button { align-self: flex-start; margin-top: 4px; }
 .account-last-change { font-size: 11px; line-height: 1.8; color: #657b5b; margin-top: 16px; }
 .account-profile-error { padding: 24px; }
+.photo-crop { display: grid; gap: 18px; margin-top: 22px; }
+.photo-crop-frame { position: relative; width: min(100%, 300px); aspect-ratio: 1; overflow: hidden; margin: auto; border-radius: 16px; background: #e9edde; cursor: grab; touch-action: none; user-select: none; }
+.photo-crop-frame:active { cursor: grabbing; }
+.photo-crop-frame:focus-visible { outline: 3px solid #76a24c; outline-offset: 4px; }
+.photo-crop-frame img { position: absolute; max-width: none; pointer-events: none; object-fit: fill; }
+.photo-crop-mask { position: absolute; inset: 0; border-radius: 50%; box-shadow: 0 0 0 80px #15251680; border: 1px solid #ffffffa0; pointer-events: none; }
+.photo-crop > p { font-size: 12px; color: #657b5b; text-align: center; }
+.photo-crop-settings { border: 0; padding: 0; display: grid; gap: 12px; min-width: 0; }
+.photo-crop-settings > label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; }
+.photo-crop-settings output { color: #657b5b; font-variant-numeric: tabular-nums; }
+.photo-crop-zoom { display: flex; align-items: center; gap: 14px; }
+.photo-crop-zoom button { flex: 0 0 36px; height: 36px; display: grid; place-items: center; border: 1px solid #dfe7d6; border-radius: 10px; background: #f6f8f0; color: #426433; }
+.photo-crop-zoom button:disabled { opacity: .4; }
+.photo-crop-zoom input { min-width: 0; width: 100%; accent-color: #527e3b; padding: 0; }
+.photo-crop-settings > button { justify-self: center; }
+.photo-crop-actions { display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #e6ebdf; padding-top: 18px; }
+@media (max-width: 420px) { .photo-crop-frame { width: min(100%, 250px); } .photo-crop-actions .btn { padding-inline: 12px; } }
 @media (max-width: 1100px) { .account-layout { grid-template-columns: 255px minmax(0, 1fr); gap: 20px; } .account-tab-content { padding: 25px; } }
 @media (max-width: 850px) { .account-layout { grid-template-columns: 1fr; } .account-identity { max-width: none; } .account-photo-controls { max-width: 400px; margin: 0 auto; } .account-identity-note { max-width: 400px; margin-left: auto; margin-right: auto; padding-left: 20px; padding-right: 20px; } }
 @media (max-width: 540px) { .account-tab-content { padding: 23px 19px; } .account-tabs { padding: 0 19px; gap: 22px; } .account-form-actions { flex-wrap: wrap; } .account-security-section form > button { max-width: 100%; white-space: normal; height: auto; min-height: 42px; } .topbar-actions .profile-avatar-button { display: inline-flex; } .topbar-actions .profile-avatar-button .avatar { display: inline-flex; } }

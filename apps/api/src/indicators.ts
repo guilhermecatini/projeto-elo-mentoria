@@ -223,7 +223,7 @@ export class IndicatorsService {
       result.hasUnpublishedChanges = !revisions[0] || revisions[0].snapshot_hash !== indicatorFingerprint(row.draft);
       result.history = await db('audit_events as a').leftJoin('users as u', 'u.id', 'a.actor_id')
         .where({'a.organization_id': user.organizationId, 'a.entity_type': 'indicator', 'a.entity_id': id})
-        .select('a.id', 'a.action', 'a.details', 'a.created_at as createdAt', 'u.name as actorName').orderBy('a.created_at', 'desc').limit(200);
+        .select('a.id', 'a.action', 'a.details', 'a.created_at as createdAt', 'a.actor_id as actorId', 'u.name as actorName').orderBy('a.created_at', 'desc').limit(200);
     }
     return result;
   }
@@ -311,7 +311,7 @@ export class IndicatorsService {
     const result: Record<string, unknown> = (await this.goals(user, {enrollmentId: row.enrollment_id})).find(goal => goal.id === id)!;
     if (user.role !== 'mentee') result.history = await db('audit_events as a').leftJoin('users as u', 'u.id', 'a.actor_id')
       .where({'a.organization_id': user.organizationId, 'a.entity_type': 'indicator_goal', 'a.entity_id': id})
-      .select('a.id', 'a.action', 'a.details', 'a.created_at as createdAt', 'u.name as actorName').orderBy('a.created_at', 'desc').limit(200);
+      .select('a.id', 'a.action', 'a.details', 'a.created_at as createdAt', 'a.actor_id as actorId', 'u.name as actorName').orderBy('a.created_at', 'desc').limit(200);
     return result;
   }
   async createGoal(user: User, input: z.infer<typeof createGoalInput>) {

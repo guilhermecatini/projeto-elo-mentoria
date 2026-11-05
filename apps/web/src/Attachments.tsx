@@ -1,3 +1,4 @@
+import {PersonName} from './components/Avatar';
 import { useEffect, useId, useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { CircleAlert, Download, FileImage, FileText, LoaderCircle, LockKeyhole, Paperclip, Upload, X } from 'lucide-react';
@@ -14,7 +15,7 @@ type Attachment = {
   sizeBytes: number;
   createdAt: string;
   createdById: string;
-  createdByName: string;
+  createdByName: string; createdByAvatarUrl?: string | null;
   visibility: 'public' | 'internal';
   downloadUrl: string;
 };
@@ -147,7 +148,7 @@ export function Attachments({ scope, canUpload, internal = false, lockedMessage,
       const typeLabel = attachment.originalName.split('.').pop()?.toUpperCase() || attachment.mimeType;
       return <li className="attachment-row" key={attachment.id}>
         <span className="attachment-file-icon">{attachment.mimeType.startsWith('image/') ? <FileImage size={19} /> : <FileText size={19} />}</span>
-        <div className="attachment-info"><strong title={attachment.originalName}>{attachment.originalName}</strong><span>{typeLabel} · {sizeLabel(Number(attachment.sizeBytes))}{attachment.visibility === 'internal' && <> · Nota interna</>}</span><small>{attachment.createdByName || 'Equipe'} · {dateLabel(attachment.createdAt)}</small></div>
+        <div className="attachment-info"><strong title={attachment.originalName}>{attachment.originalName}</strong><span>{typeLabel} · {sizeLabel(Number(attachment.sizeBytes))}{attachment.visibility === 'internal' && <> · Nota interna</>}</span><small><PersonName name={attachment.createdByName} src={attachment.createdByAvatarUrl} fallback={'Equipe'} /> · {dateLabel(attachment.createdAt)}</small></div>
         {href ? <a className="attachment-download" href={href} download aria-label={`Baixar ${attachment.originalName}`}><Download size={16} /><span>Baixar</span></a> : <span className="attachment-unavailable">Indisponível</span>}
       </li>;
     })}</ul>}

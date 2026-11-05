@@ -1,3 +1,4 @@
+import {PersonName} from './components/Avatar';
 import { Collapse } from './components/ui/disclosure';
 import { useMotionRegion } from './lib/use-motion-region';
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
@@ -16,7 +17,7 @@ type DiagnosisContent = { title: string; context: string; maturity: Maturity; fi
 type PublishedDiagnosis = DiagnosisContent & { version: number; publishedAt: string };
 type LinkedPlan = { planId: string; planTitle: string; version: number; findingId?: string; findingArea?: Area; linkedAt?: string };
 type DiagnosisRow = { id: string; enrollmentId: string; enrollmentStatus: string; clientId: string; clientName: string; title: string; context?: string; maturity: Maturity; status: 'draft' | 'published' | 'archived'; draftVersion?: number; publishedVersion: number | null; publishedAt?: string; createdAt?: string; updatedAt?: string };
-type Diagnosis = DiagnosisRow & { draft?: DiagnosisContent; published?: PublishedDiagnosis | null; revisions: { version: number; publishedAt: string }[]; linkedPlans: LinkedPlan[]; history?: { id: string; action: string; createdAt: string; actorName?: string; details?: Record<string, unknown> }[] };
+type Diagnosis = DiagnosisRow & { draft?: DiagnosisContent; published?: PublishedDiagnosis | null; revisions: { version: number; publishedAt: string }[]; linkedPlans: LinkedPlan[]; history?: { id: string; action: string; createdAt: string; actorName?: string; actorAvatarUrl?: string | null; details?: Record<string, unknown> }[] };
 type DiagnosisTemplate = { id: string; name: string; description?: string; version: number; active: boolean; areas: { area: Area; prompt: string }[] };
 const areaLabels: Record<Area, string> = { catalog: 'Catálogo e anúncios', pricing: 'Precificação e margem', stock: 'Estoque e disponibilidade', logistics: 'Logística e entregas', reputation: 'Reputação e atendimento', advertising: 'Publicidade e vendas', operations: 'Operação e equipe', priorities: 'Bloqueios e prioridades' };
 const assessmentLabels: Record<Assessment, string> = { not_assessed: 'Não avaliado', adequate: 'Adequado', attention: 'Precisa de atenção', critical: 'Prioridade crítica', not_applicable: 'Não se aplica' };
@@ -120,7 +121,7 @@ function DiagnosisPlanDialog({ diagnosis, snapshot, action, onClose, go, notify 
 }
 
 function DiagnosisHistory({ events }: { events: Diagnosis['history'] }) {
-  return <section className="panel plan-history"><div className="panel-heading"><div><h2>Histórico de preparação</h2><p>Alterações e publicações registradas pela equipe.</p></div><FilePenLine size={18} /></div><div className="timeline">{events?.length ? events.map(event => <div className="timeline-item" key={event.id}><span className="timeline-dot" /><div><strong>{event.action}</strong>{typeof event.details?.reason === 'string' && <p>Motivo: {event.details.reason}</p>}<small>{dateLabel(event.createdAt)}{event.actorName ? ` · ${event.actorName}` : ''}</small></div></div>) : <p className="small-empty">Nenhuma alteração adicional registrada.</p>}</div></section>;
+  return <section className="panel plan-history"><div className="panel-heading"><div><h2>Histórico de preparação</h2><p>Alterações e publicações registradas pela equipe.</p></div><FilePenLine size={18} /></div><div className="timeline">{events?.length ? events.map(event => <div className="timeline-item" key={event.id}><span className="timeline-dot" /><div><strong>{event.action}</strong>{typeof event.details?.reason === 'string' && <p>Motivo: {event.details.reason}</p>}<small>{dateLabel(event.createdAt)}{event.actorName && <> · <PersonName name={event.actorName} src={event.actorAvatarUrl} /></>}</small></div></div>) : <p className="small-empty">Nenhuma alteração adicional registrada.</p>}</div></section>;
 }
 
 export function ClientDiagnostics({ enrollmentId, user, go }: { enrollmentId: string; user: User; go: (path: string) => void }) {

@@ -224,7 +224,7 @@ export class PlansService {
   private async history(user: User, type: string, id: string) {
     return db('audit_events as a').leftJoin('users as u', 'u.id', 'a.actor_id')
       .where({'a.organization_id': user.organizationId, 'a.entity_type': type, 'a.entity_id': id})
-      .select('a.id', 'a.action', 'a.created_at as createdAt', 'u.name as actorName', 'a.details')
+      .select('a.id', 'a.action', 'a.created_at as createdAt', 'a.actor_id as actorId', 'u.name as actorName', 'a.details')
       .orderBy('a.created_at', 'desc').limit(200);
   }
 

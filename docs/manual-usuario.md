@@ -243,13 +243,13 @@ Edite seus dados pessoais e cuide da foto, do e-mail e da senha da sua conta.
 
 2. **Atualize os dados pessoais.** Na aba “Dados pessoais”, confira o nome completo e o telefone opcional com DDD. Clique em “Salvar alterações”. Se uma edição de outro acesso for detectada, recarregue os dados antes de tentar novamente. “Descartar alterações e recarregar” substitui o que ainda não foi salvo no formulário.
 
-3. **Adicione ou troque a foto.** Use “Adicionar foto” ou “Escolher outra foto”. Selecione PNG, JPEG ou WEBP de até 2 MB e 20 megapixels. Confira a prévia e clique em “Salvar foto”. A imagem é ajustada ao formato quadrado e aparece no perfil, no menu e no cabeçalho. “Descartar seleção” mantém a foto anterior; “Remover foto” volta a exibir suas iniciais.
+3. **Adicione ou troque a foto.** Use “Adicionar foto” ou “Escolher outra foto”. Selecione PNG, JPEG ou WEBP de até 2 MB e 20 megapixels. Na janela de recorte, arraste a imagem (ou use as setas do teclado) e ajuste o zoom. O círculo mostra o enquadramento do avatar. Clique em “Usar este recorte”, confira a prévia e finalize em “Salvar foto”. Antes de salvar, “Reajustar recorte” permite corrigir a seleção. A foto também identifica você nas mensagens de atendimentos, tarefas, reuniões e históricos que cada pessoa tem permissão para consultar. “Descartar seleção” mantém a foto anterior; “Remover foto” volta a exibir suas iniciais.
 
 4. **Altere a senha.** Na aba “Segurança”, preencha senha atual, nova senha e confirmação. Use de 12 a 128 caracteres e informe o código do autenticador, se solicitado. Clique em “Alterar senha”. A sessão deste dispositivo é renovada e os outros acessos e links de recuperação anteriores são invalidados.
 
 5. **Altere o e-mail de acesso.** Ainda em “Segurança”, informe o novo e-mail, a senha atual e o código do autenticador quando ativo. Confira a grafia e clique em “Atualizar e-mail”. Use o novo endereço no próximo login; os outros dispositivos precisarão entrar novamente. Não há envio automático de confirmação por e-mail nesta versão.
 
-**Como saber que deu certo:** Os dados salvos aparecem no seu perfil; a foto atualiza o menu e o cabeçalho, e suas alterações de acesso passam a valer nos próximos logins.
+**Como saber que deu certo:** Os dados salvos aparecem no seu perfil; a foto recortada aparece nas suas identificações pela plataforma, e suas alterações de acesso passam a valer nos próximos logins.
 
 > **Guarde seus dados de acesso:** Não registre senhas ou códigos do autenticador em atendimentos, materiais ou notas. A tela não permite alterar seu papel, carteira ou empresas autorizadas.
 

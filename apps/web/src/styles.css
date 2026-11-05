@@ -207,7 +207,10 @@ td small { display: block; color: #a0aa91; font-size: 10px; margin-top: 7px; }
 .message-meta time { margin-left: auto; font-size: 9px; color: #9dab8b; }
 .message p { font-size: 12px; line-height: 1.9; color: #6f8160; white-space: pre-wrap; overflow-wrap: anywhere; margin-top: 13px; }
 .message.event p { margin-top: 8px; font-size: 11px; }
-.message.event .avatar { display: none; }
+.person-name { display: inline-flex; align-items: center; vertical-align: middle; gap: 6px; max-width: 100%; line-height: 1.4; }
+.person-name .avatar.small { width: 22px; height: 22px; min-width: 22px; font-size: 8px; flex-shrink: 0; }
+.person-name-label { min-width: 0; overflow-wrap: anywhere; }
+.ticket-row .person-name .avatar { display: inline-flex; }
 .reply-button { display: inline-flex; align-items: center; gap: 5px; color: #8a9e79; font-size: 10px; background: none; padding: 0; margin-top: 14px; }
 .reply-button:hover { color: #456d3a; }
 .reply-reference { display: flex; gap: 6px; align-items: flex-start; margin-top: 13px; border-left: 2px solid #c0d0ad; padding-left: 9px; font-size: 10px; color: #8a9f75; line-height: 1.7; }

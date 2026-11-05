@@ -97,7 +97,7 @@ export class ReportsService {
     const followupQueue=portfolio.filter(e=>e.withoutRecentContact).sort((a,b)=>time(a.dueAt)-time(b.dueAt));
     const queue=tickets.filter(t=>t.status!=='resolved').map(t=>{
       const e=enrollMap.get(t.enrollment_id)!;const a=owner(e.id);const pending=overdueEvents.filter(s=>s.ticket_id===t.id);
-      return {id:t.id,enrollmentId:e.id,clientName:e.clientName,subject:t.subject,status:t.status,priority:t.priority,mentorName:a?.mentorName||'Sem responsável',overdue:overdueTicketIds.has(t.id),
+      return {id:t.id,enrollmentId:e.id,clientName:e.clientName,subject:t.subject,status:t.status,priority:t.priority,mentorId:a?.mentor_id||null,mentorName:a?.mentorName||'Sem responsável',overdue:overdueTicketIds.has(t.id),
         reasons:pending.map(s=>slaLabels[s.kind]+' vencida'),oldestDueAt:pending.map(s=>s.due_at).sort((a,b)=>time(a)-time(b))[0]||null,actionUrl:`/tickets/${t.id}`};
     }).sort((a,b)=>Number(b.overdue)-Number(a.overdue)||time(a.oldestDueAt||now)-time(b.oldestDueAt||now));
     const byMentor=Array.from(new Set(assignments.filter(a=>ids.includes(a.enrollment_id)).map(a=>a.mentor_id))).filter(id=>user.role==='admin'||id===user.id).map(id=>{

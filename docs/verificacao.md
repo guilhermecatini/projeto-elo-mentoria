@@ -615,3 +615,30 @@ declaração de prontidão irrestrita para dados reais em produção.
 - API, worker e frontend reconstruídos e atualizados. Prontidão confirmou banco,
   fila e worker. Instalação de dependências reportou zero vulnerabilidades.
   Dependência nova: `sharp@0.35.5`. O aviso de bundle principal do Vite permanece.
+
+
+## Recorte de perfil e fotos nas identificações — 05/11/2026
+
+- Adicionado diálogo de recorte com arraste, setas do teclado, zoom de 1× a 4×,
+  redefinição e máscara circular. A seleção pode ser reajustada antes de salvar;
+  cancelar mantém o recorte anterior. O navegador exporta o quadrado escolhido e
+  a API valida/regrava a imagem pelo fluxo existente.
+- Fotos de autores, responsáveis, participantes, mentores e atores dos históricos
+  aparecem nas telas autorizadas. Um componente compartilhado mantém as iniciais
+  como alternativa. Empresas preservam sua identificação própria.
+- URLs de outras pessoas são assinadas por pessoa que consulta, organização, papel,
+  contexto e versão. A leitura revalida o acesso vigente. UUIDs e URLs copiadas
+  entre contas não concedem acesso; retirada de compartilhamento de avaliação,
+  transferência de carteira, visibilidade de material e troca/remoção de foto foram
+  verificadas. Conteúdo livre e detalhes de auditoria não geram autorização de foto.
+- 140 testes unitários/verificações aprovados (API 128, frontend 12), mais nove
+  resultados da integração de avatares, 11 de perfil, nove de segurança e nove de
+  atendimento. Todos os testes de escrita usaram bancos, APIs e Redis isolados.
+- Navegador: recorte por arraste/teclado/zoom; exportação de 512 × 512; reajuste e
+  cancelamento preservando a seleção; salvamento e atualização dos avatares; fotos
+  carregadas nas mensagens públicas/internas autorizadas e nos responsáveis,
+  participantes e histórico da reunião. Verificado em desktop e 390 × 844 sem
+  transbordamento horizontal. Fotos fictícias foram usadas em uma instalação de
+  teste isolada; o perfil da demonstração foi preservado.
+- Manual e guia Meu perfil atualizados. Build de API/frontend aprovado. API,
+  worker e frontend locais atualizados; nenhuma migração adicional foi necessária.

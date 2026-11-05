@@ -79,7 +79,7 @@ export function validateAttachment(file: UploadFile) {
 
 function metadata(row: any) {
   return {
-    id: row.id, ticketId: row.ticket_id, messageId: row.message_id, taskId: row.task_id,
+    id: row.id, enrollmentId: row.enrollment_id, ticketId: row.ticket_id, messageId: row.message_id, taskId: row.task_id,
     originalName: row.original_name, mimeType: row.mime_type, sizeBytes: Number(row.size_bytes),
     createdAt: row.ready_at || row.created_at, createdById: row.created_by,
     createdByName: row.createdByName, visibility: row.visibility,

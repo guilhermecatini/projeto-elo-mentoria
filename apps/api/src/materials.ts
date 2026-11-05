@@ -83,7 +83,7 @@ export class MaterialsService implements OnModuleInit,OnModuleDestroy {
       result.draftVersion=row.version;result.draft={...row.draft,file:await this.contentFile(row.draft,row)};
       result.enrollmentStatus=row.enrollment_id?(await enrollment(user,row.enrollment_id)).status:null;
       result.hasUnpublishedChanges=!revisions[0]||revisions[0].source_hash!==materialHash(row.draft);
-      result.history=await db('audit_events as a').leftJoin('users as u','u.id','a.actor_id').where({'a.organization_id':user.organizationId,'a.entity_type':'material','a.entity_id':id}).select('a.id','a.action','a.details','a.created_at as createdAt','u.name as actorName').orderBy('a.created_at','desc').limit(100);
+      result.history=await db('audit_events as a').leftJoin('users as u','u.id','a.actor_id').where({'a.organization_id':user.organizationId,'a.entity_type':'material','a.entity_id':id}).select('a.id','a.action','a.details','a.created_at as createdAt','a.actor_id as actorId', 'u.name as actorName').orderBy('a.created_at','desc').limit(100);
     }return result;
   }
   async create(user:User,input:z.infer<typeof createInput>){

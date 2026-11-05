@@ -23,6 +23,7 @@ import {JourneyModule,JourneyService,journeyEnrollmentInput} from './journey';
 import {MaterialsModule} from './materials';
 import {IntegrationsModule} from './integrations';
 import {ProfileModule} from './profile';
+import {PeopleAvatarsModule} from './people-avatars';
 const text=z.string().trim().min(1).max(10000),uuid=z.string().uuid(),instant=z.iso.datetime({offset:true});
 const parse=(schema:z.ZodType,data:unknown)=>schema.parse(data);
 @Catch()
@@ -73,7 +74,7 @@ class Api {
  private origin(req:any){const origin=req.get('Origin');if(origin&&origin!==process.env.APP_ORIGIN)throw new ForbiddenException('Origem inválida.');}
  private async rate(ip:string,kind:string){const k='elo:'+kind+':'+hash(ip),n=await redis.incr(k);if(n===1)await redis.expire(k,900);if(n>15)throw new ForbiddenException('Muitas tentativas. Aguarde 15 minutos.');}
 }
-@Module({imports:[PlansModule,AttachmentsModule,MeetingsModule,DiagnosticsModule,IndicatorsModule,ReportsModule,CommercialModule,JourneyModule,MaterialsModule,IntegrationsModule,ProfileModule],controllers:[Api],providers:[Operations,{provide:APP_GUARD,useClass:AuthGuard}]})class AppModule{}
+@Module({imports:[PlansModule,AttachmentsModule,MeetingsModule,DiagnosticsModule,IndicatorsModule,ReportsModule,CommercialModule,JourneyModule,MaterialsModule,IntegrationsModule,ProfileModule,PeopleAvatarsModule],controllers:[Api],providers:[Operations,{provide:APP_GUARD,useClass:AuthGuard}]})class AppModule{}
 async function main(){if(process.env.NODE_ENV==='production'&&(!process.env.SESSION_SECRET||process.env.SESSION_SECRET.length<32))throw new Error('SESSION_SECRET obrigatório.');const app=await NestFactory.create<NestExpressApplication>(AppModule,{logger:['error','warn','log']});app.use(helmet());
 // A bounded 64 KiB CSV can double in size when JSON escapes quotes or backslashes.
 // Keep the original JSON limit for other endpoints; CSV bytes are checked separately.

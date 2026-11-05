@@ -17,6 +17,7 @@
     "test:acceptance": "npm run build -w @mentoria/api && node tests/run-acceptance.mjs",
     "test:security": "npm run build -w @mentoria/api && node --test tests/auth-security.mjs",
     "test:profile": "npm run build -w @mentoria/api && node --test tests/profile-acceptance.mjs",
+    "test:avatars": "npm run build -w @mentoria/api && node --test tests/people-avatars-acceptance.mjs",
     "test:plans": "npm run build -w @mentoria/api && node --test tests/plans-acceptance.mjs",
     "test:attachments": "npm run build -w @mentoria/api && node --test tests/attachments-acceptance.mjs",
     "test:meetings": "npm run build -w @mentoria/api && node --test tests/meetings-acceptance.mjs",

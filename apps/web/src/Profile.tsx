@@ -3,6 +3,7 @@ import {useQuery, useQueryClient} from '@tanstack/react-query';
 import {Camera, CheckCircle2, Eye, EyeOff, ImagePlus, KeyRound, LoaderCircle, LockKeyhole, Mail, Save, ShieldCheck, Trash2, UserRound, X} from 'lucide-react';
 import {Button} from './components/ui/button';
 import {Avatar} from './components/Avatar';
+import {PhotoCrop, type CropSource} from './components/PhotoCrop';
 import {api, patch, post, setCsrf, type User} from './lib/api';
 import {useMotionRegion} from './lib/use-motion-region';
 import './profile.css';
@@ -42,6 +43,8 @@ function ProfileEditor({initial, onUserChange, notify}: Props & {initial: Profil
   const [busy, setBusy] = useState('');
   const [errors, setErrors] = useState<Record<string, unknown>>({});
   const [file, setFile] = useState<File | null>(null);
+  const [cropSource, setCropSource] = useState<CropSource | null>(null);
+  const [original, setOriginal] = useState<CropSource | null>(null);
   const [preview, setPreview] = useState('');
   const fileInput = useRef<HTMLInputElement>(null);
   const photoRequest = useRef(0);
@@ -58,7 +61,7 @@ function ProfileEditor({initial, onUserChange, notify}: Props & {initial: Profil
     onUserChange({id: value.id, name: value.name, email: value.email, role: value.role, avatarUrl: value.avatarUrl});
     void queryClient.invalidateQueries({predicate: query => query.queryKey[0] !== 'profile'});
   }
-  function resetFile() { photoRequest.current++; setFile(null); if (fileInput.current) fileInput.current.value = ''; }
+  function resetFile() { photoRequest.current++; setFile(null); setOriginal(null); setCropSource(null); if (fileInput.current) fileInput.current.value = ''; }
   async function choosePhoto(selected?: File) {
     error('photo', null);
     const request = ++photoRequest.current;
@@ -67,10 +70,12 @@ function ProfileEditor({initial, onUserChange, notify}: Props & {initial: Profil
     if (!selected.size || selected.size > 2 * 1024 * 1024) { error('photo', new Error('A foto deve ter no máximo 2 MB.')); return; }
     try {
       const image = await createImageBitmap(selected);
-      const valid = image.width * image.height <= 20_000_000; image.close();
+      const {width, height} = image;
+      const valid = width * height <= 20_000_000; image.close();
       if (request !== photoRequest.current) return;
       if (!valid) { error('photo', new Error('Escolha uma foto de até 20 megapixels.')); return; }
-      setFile(selected);
+      setCropSource({file: selected, width, height});
+      if (fileInput.current) fileInput.current.value = '';
     } catch { if (request === photoRequest.current) error('photo', new Error('Não foi possível abrir esta foto. Escolha outra imagem.')); }
   }
   async function upload() {
@@ -122,8 +127,8 @@ function ProfileEditor({initial, onUserChange, notify}: Props & {initial: Profil
     <div className="page-title"><div><span className="eyebrow">SEU ESPAÇO, DO SEU JEITO</span><h1>Meu perfil</h1><p>Cuide dos seus dados, da sua foto e da segurança do seu acesso.</p></div><span className="account-private"><LockKeyhole size={15} />Sua conta pessoal</span></div>
     <div className="account-layout">
       <aside className="panel account-identity"><div className="account-identity-banner" /><div className="account-picture"><Avatar name={profile.name} src={preview || profile.avatarUrl} /><span aria-hidden="true"><Camera size={17} /></span></div><h2>{profile.name}</h2><p className="account-email">{profile.email}</p><span className="badge green">{roles[profile.role]}</span>
-        <div className="account-photo-controls"><input ref={fileInput} type="file" accept="image/png,image/jpeg,image/webp" aria-label="Escolher foto do perfil" className="sr-only" tabIndex={-1} onChange={event => void choosePhoto(event.target.files?.[0])} disabled={!!busy} /><Button variant="outline" onClick={() => fileInput.current?.click()} disabled={!!busy}><ImagePlus size={16} />{profile.avatarUrl ? 'Escolher outra foto' : 'Adicionar foto'}</Button><p>PNG, JPEG ou WEBP · Até 2 MB.<br />A foto será ajustada para o formato quadrado.</p>
-          {file && <div className="account-photo-preview"><span>{file.name}</span><Button onClick={upload} disabled={!!busy}>{busy === 'photo' ? <LoaderCircle className="spin" /> : <CheckCircle2 />}Salvar foto</Button><button className="text-button" onClick={resetFile} disabled={!!busy}><X size={14} />Descartar seleção</button></div>}
+        <div className="account-photo-controls"><input ref={fileInput} type="file" accept="image/png,image/jpeg,image/webp" aria-label="Escolher foto do perfil" className="sr-only" tabIndex={-1} onChange={event => void choosePhoto(event.target.files?.[0])} disabled={!!busy} /><Button variant="outline" onClick={() => fileInput.current?.click()} disabled={!!busy}><ImagePlus size={16} />{profile.avatarUrl ? 'Escolher outra foto' : 'Adicionar foto'}</Button><p>PNG, JPEG ou WEBP · Até 2 MB.<br />Ajuste a posição e o zoom antes de salvar.</p>
+          {file && <div className="account-photo-preview"><span>Recorte pronto para salvar</span><button className="text-button" onClick={() => setCropSource(original)} disabled={!!busy}>Reajustar recorte</button><Button onClick={upload} disabled={!!busy}>{busy === 'photo' ? <LoaderCircle className="spin" /> : <CheckCircle2 />}Salvar foto</Button><button className="text-button" onClick={resetFile} disabled={!!busy}><X size={14} />Descartar seleção</button></div>}
           {profile.avatarUrl && !file && <button className="text-button account-remove-photo" onClick={removePhoto} disabled={!!busy}>{busy === 'remove' ? <LoaderCircle size={14} className="spin" /> : <Trash2 size={14} />}Remover foto</button>}<ErrorBox error={errors.photo} />
         </div><div className="account-identity-note"><ShieldCheck size={19} /><p>Seus vínculos e permissões são gerenciados pela administração da mentoria.</p></div>
       </aside>
@@ -135,5 +140,6 @@ function ProfileEditor({initial, onUserChange, notify}: Props & {initial: Profil
         </div>
       </section>
     </div>
+    {cropSource && <PhotoCrop source={cropSource} onClose={() => setCropSource(null)} onApply={(cropped, position) => { setFile(cropped); setOriginal({...cropSource, position}); }} />}
   </div>;
 }
