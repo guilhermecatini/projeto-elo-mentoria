@@ -516,3 +516,102 @@ indicadores/metas/importação e exportação CSV, comercial/financeiro administ
 jornada/renovação/satisfação/capacidade, materiais, relatórios e preparação de
 integrações. Os limites acima permanecem; a validação local não constitui uma
 declaração de prontidão irrestrita para dados reais em produção.
+
+## Central de ajuda e manual de uso — 04/11/2026
+
+- Central disponível em `#/help`, no menu dos três perfis e no botão de ajuda do
+  cabeçalho. São 42 guias em oito capítulos, com roteiros por perfil, pré-requisitos,
+  passos numerados, resultado esperado, orientações para dificuldades, glossário,
+  referências relacionadas e atalhos para os módulos correspondentes.
+- A apresentação filtra os guias conforme o perfil: Administração, 39; Mentor, 30;
+  Mentorado, 16. O manual em `docs/manual-usuario.md` reúne os três perfis. A fonte
+  compartilhada é `apps/web/src/help-content.ts`; `npm run docs:manual` regenera o
+  documento e `npm run docs:manual -- --check` verifica sua sincronização.
+- A busca combina as palavras, ignora caixa/acentos e procura no procedimento
+  completo. Usa início de palavra para evitar que “ata” corresponda apenas a um
+  trecho de “contratação”. Categorias, busca e guia podem ser abertos por URL.
+- Build TypeScript/Vite do frontend aprovado. `npm test` executou 124 testes da
+  API e quatro verificações novas do manual, todos aprovados. Depois dos ajustes
+  finais de conteúdo e busca, as quatro verificações do manual, seu gerador e o
+  build do frontend foram executados novamente, sem falhas. Há aviso do Vite de
+  tamanho do bundle principal acima de 500 kB; a central usa carregamento separado.
+- Frontend Docker reconstruído e atualizado isoladamente na instalação local.
+  Nenhuma migration ou seed foi necessário para o manual.
+- Navegador: entrada com as três contas de demonstração; central e roteiros de
+  cada perfil; busca por “publicar ata”; orientação sem resultados; limpeza e
+  filtro de reuniões; leitura de guia; cópia do link sem filtros; bloqueio de guia
+  administrativo na apresentação do mentorado; atalho do guia de execução para
+  a tela real de tarefas do mentorado.
+- Página inicial e leitura de artigo inspecionadas em desktop e em 390 × 844.
+  No celular, a largura da página foi 375 px para viewport de 390 px, sem
+  transbordamento horizontal; capítulos têm rolagem própria. Override temporário
+  removido após a conferência. Capturas em `artifacts/wiki-central-ajuda.png`,
+  `artifacts/wiki-guia-ata.png` e `artifacts/wiki-guia-mobile.png`.
+- Impressão de guia ou manual por perfil tem apresentação própria em CSS. Não foi
+  realizado ensaio de impressão física ou revisão de um PDF gerado pelo navegador.
+
+## Transições da plataforma — 04/11/2026
+
+- Padrão central em `apps/web/src/motion.css`, com tempos de 120, 180 e 220 ms,
+  feedback de controles, cartões, campos, avisos, menu móvel e entrada/saída de
+  diálogos. A navegação do workspace aplica o efeito em todos os módulos.
+- As abas de acompanhamento, planos, atas, diagnósticos, indicadores, jornada,
+  materiais, comercial e relatórios usam `useMotionRegion`. O efeito atua no nó
+  existente, sem remontar formulários para animar. Buscas e filtros não reiniciam
+  a transição da página inteira. Animações interrompidas são canceladas.
+- Seções expansíveis usam `Disclosure`/`Collapse`. Campos antes contidos em
+  `details` permanecem montados ao recolher; conteúdo fechado fica inerte e fora da
+  árvore acessível. Diálogos condicionais aguardam a saída com `useDialogDismiss`.
+  O componente compartilhado de diálogo restaura o foco ao controle que o abriu.
+- Menu móvel: fundo e painel têm transições coordenadas; navegação fechada fica
+  inerte. Aberto, o menu foca o item atual, limita o Tab ao menu, bloqueia o fundo
+  e a rolagem da página e devolve o foco ao acionador ao fechar com Escape.
+- `prefers-reduced-motion` desativa os efeitos CSS e impede a animação de regiões.
+  Alterar a preferência durante uma animação cancela o efeito. Os testes cobrem
+  esses dois casos e a remoção de observadores. Não foi alterada a preferência
+  de acessibilidade do Windows durante a validação.
+- `npm test`: 124 testes da API e nove do frontend aprovados (133 no total).
+  Após os ajustes finais, build e nove testes do frontend repetidos com sucesso;
+  manual de 42 guias continua sincronizado. O build mantém o aviso de tamanho do
+  bundle principal, agora aproximadamente 503 kB antes de gzip.
+- Navegador: abertura dos módulos da operação e administração sem erros de console;
+  troca entre ata compartilhada e preparação; abertura/fechamento de formulários;
+  recolher/reabrir diagnóstico comercial preservando o texto e o vínculo do campo
+  ao formulário; retorno do foco após cancelar sem salvar.
+- Em 390 × 844, conferidos abertura/fechamento do menu, item atual, Tab/Shift+Tab,
+  Escape e retorno do foco. Funil com 343 px visíveis e rolagem interna de 2.338 px;
+  página com 375 px de largura para viewport de 390 px, sem transbordamento horizontal.
+  O override de viewport foi removido após a conferência.
+- Frontend Docker reconstruído e atualizado. A conferência usou a conta
+  administrativa de demonstração, sem confirmar cadastros ou alterações de negócio.
+
+## Perfil pessoal, foto e dados de acesso — 04/11/2026
+
+- Área `#/profile` disponível nos três perfis, pelo menu, pelo nome e pelo avatar.
+  Nome/telefone, prévia de foto, envio/remoção e aba Segurança para e-mail e senha.
+  Transições compartilhadas, abas com teclado e campos de senha com rótulo próprio.
+  O manual agora reúne 43 guias, incluindo o uso do perfil.
+- Migration 015 aplicada após backup PostgreSQL em
+  `.local/pre-profile-88dab327/database.dump` (265.914 bytes). Contagens conferidas
+  antes/depois: usuários 5; empresas 7; contratações 8; atendimentos 6; mensagens 13;
+  planos 4; tarefas 10. Não foi executado seed na instalação local.
+- Foto regravada como WEBP privado no banco, com limitação de bytes/pixels e remoção
+  dos metadados originais. A prévia local usa URL temporária, liberada após descarte.
+  A aplicação mantém iniciais quando não há foto.
+- E-mail/senha exigem reautenticação e MFA quando ativo. A sessão atual é substituída
+  e as outras sessões e links pendentes são revogados atomicamente. Login concorrente
+  com credenciais antigas não produz sessão que sobreviva à troca. Trocas preservam
+  espaços significativos na senha e não desativam MFA.
+- 137 testes unitários/verificações passaram: 128 da API e nove do frontend.
+  Integração de perfil: 11 resultados (dez cenários e grupo); segurança: nove;
+  atendimento: nove. Todos aprovados em bancos/API/Redis isolados. Os últimos ajustes
+  de rótulos e carga inicial passaram no build Docker do frontend.
+- Navegador na demonstração: abertura pelo nome; dados atuais; aba Segurança;
+  campos pessoais preservados ao trocar de aba; recarga explícita sem salvar;
+  escolha de PNG de teste, prévia e descarte sem enviar; revisão de layout em
+  390 × 844 com página de 375 px, sem transbordamento horizontal. Alterações reais
+  de senha, e-mail, dados pessoais e foto foram exercitadas somente pelos testes
+  isolados. Não foi alterada a senha da conta usada no navegador.
+- API, worker e frontend reconstruídos e atualizados. Prontidão confirmou banco,
+  fila e worker. Instalação de dependências reportou zero vulnerabilidades.
+  Dependência nova: `sharp@0.35.5`. O aviso de bundle principal do Vite permanece.

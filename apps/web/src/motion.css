@@ -1,0 +1,77 @@
+/* Shared motion language. No entrance delays: content and controls are usable immediately. */
+:root {
+  --motion-fast: 120ms;
+  --motion: 180ms;
+  --motion-page: 220ms;
+  --motion-expand: 220ms;
+  --motion-ease: cubic-bezier(.2, 0, 0, 1);
+  --motion-enter: cubic-bezier(.16, 1, .3, 1);
+}
+
+button, a, input, textarea, select, summary {
+  transition-property: background-color, color, border-color, box-shadow, opacity, translate, scale;
+  transition-duration: var(--motion);
+  transition-timing-function: var(--motion-ease);
+}
+.ui-button, .icon-button { transition-duration: var(--motion-fast); }
+.motion-region { min-width: 0; max-width: 100%; }
+.composer { transition: background-color var(--motion) var(--motion-ease), border-color var(--motion) var(--motion-ease); }
+.ui-button:enabled:active, a.ui-button:active, .icon-button:enabled:active { scale: .98; }
+button:disabled, [aria-disabled="true"] { scale: none; translate: none; }
+.badge, .nav-count, .notification-row { transition: background-color var(--motion) var(--motion-ease), color var(--motion) var(--motion-ease), opacity var(--motion) var(--motion-ease); }
+.plan-progress-track > span, progress::-webkit-progress-value, progress::-moz-progress-bar { transition: width var(--motion-expand) var(--motion-ease); }
+
+/* Radix keeps these nodes mounted until their exit animations finish. */
+.dialog-overlay[data-state="open"] { animation: motion-fade-in var(--motion) var(--motion-ease); }
+.dialog-overlay[data-state="closed"] { animation: motion-fade-out var(--motion-fast) var(--motion-ease); pointer-events: none; }
+.dialog-content[data-state="open"] { animation: motion-dialog-in var(--motion-page) var(--motion-enter); }
+.dialog-content[data-state="closed"] { animation: motion-dialog-out var(--motion-fast) var(--motion-ease); pointer-events: none; }
+.dialog-close:hover { background: #edf1e7; color: #41674c; }
+
+.toast { animation: motion-toast-in var(--motion-page) var(--motion-enter); }
+.error-box, .empty, .material-empty, .help-empty, .attachment-error { animation: motion-fade-in var(--motion) var(--motion-ease); }
+.login-form, .activation-card { animation: motion-content-in var(--motion-page) var(--motion-enter); }
+
+/* Card lift only for precise pointers; touch receives immediate press feedback. */
+:is(.stat-card, .plan-card, .meeting-card, .diagnosis-card, .journey-cycle-card, .material-card, .reports-card, .help-learning-list a) {
+  transition-property: background-color, color, border-color, box-shadow, opacity, translate;
+  transition-duration: var(--motion);
+  transition-timing-function: var(--motion-ease);
+}
+@media (hover: hover) and (pointer: fine) {
+  :is(.stat-card, .plan-card, .meeting-card, .diagnosis-card, .journey-cycle-card, .material-card, .reports-card, .help-learning-list a):not(:disabled):hover { translate: 0 -2px; }
+}
+
+.disclosure-trigger { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; background: transparent; padding: 3px 0; color: inherit; font: inherit; font-weight: 600; text-align: left; }
+.disclosure-trigger > span { display: flex; align-items: center; gap: 10px; }
+.disclosure-trigger > svg, .integration-expand > svg { transition: rotate var(--motion) var(--motion-ease); }
+.diagnosis-area-toggle > svg { transition: transform var(--motion) var(--motion-ease); }
+.disclosure-trigger[aria-expanded="true"] > svg, .integration-expand[aria-expanded="true"] > svg { rotate: 180deg; }
+.motion-collapse { display: grid; grid-template-rows: 0fr; opacity: 0; visibility: hidden; transition: grid-template-rows var(--motion-expand) var(--motion-ease), opacity var(--motion) var(--motion-ease), visibility 0s var(--motion-expand); }
+.motion-collapse[data-open="true"] { grid-template-rows: 1fr; opacity: 1; visibility: visible; transition-delay: 0s; }
+.motion-collapse-inner { min-height: 0; overflow: hidden; }
+
+@media (max-width: 780px) {
+  .sidebar { transition: transform var(--motion-page) var(--motion-enter); }
+  .mobile-scrim { display: block; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity var(--motion) var(--motion-ease), visibility 0s var(--motion-page); }
+  .mobile-scrim.open { opacity: 1; visibility: visible; pointer-events: auto; transition-delay: 0s; }
+}
+@media (min-width: 781px) { .mobile-scrim { display: none; } }
+
+@keyframes motion-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes motion-fade-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes motion-content-in { from { opacity: .65; translate: 0 6px; } to { opacity: 1; translate: 0 0; } }
+@keyframes motion-dialog-in { from { opacity: 0; translate: 0 8px; scale: .985; } to { opacity: 1; translate: 0 0; scale: 1; } }
+@keyframes motion-dialog-out { from { opacity: 1; translate: 0 0; scale: 1; } to { opacity: 0; translate: 0 4px; scale: .99; } }
+@keyframes motion-toast-in { from { opacity: 0; translate: 0 8px; } to { opacity: 1; translate: 0 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --motion-fast: 0ms; --motion: 0ms; --motion-page: 0ms; --motion-expand: 0ms; }
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  .material-card:hover { transform: none; }
+  :is(.stat-card, .plan-card, .meeting-card, .diagnosis-card, .journey-cycle-card, .material-card, .reports-card, .help-learning-list a):hover { translate: none; }
+  .ui-button:active, .icon-button:active { scale: none; }
+}
+@media print {
+  *, *::before, *::after { animation: none !important; transition: none !important; translate: none !important; scale: none !important; }
+}

@@ -8,6 +8,7 @@
   "scripts": {
     "build": "npm run build --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
+    "docs:manual": "node --import tsx scripts/generate-user-manual.ts",
     "dev:api": "node scripts/dev.mjs api",
     "dev:web": "node scripts/dev.mjs web",
     "dev:worker": "node scripts/dev.mjs worker",
@@ -15,6 +16,7 @@
     "db:seed": "node scripts/dev.mjs seed",
     "test:acceptance": "npm run build -w @mentoria/api && node tests/run-acceptance.mjs",
     "test:security": "npm run build -w @mentoria/api && node --test tests/auth-security.mjs",
+    "test:profile": "npm run build -w @mentoria/api && node --test tests/profile-acceptance.mjs",
     "test:plans": "npm run build -w @mentoria/api && node --test tests/plans-acceptance.mjs",
     "test:attachments": "npm run build -w @mentoria/api && node --test tests/attachments-acceptance.mjs",
     "test:meetings": "npm run build -w @mentoria/api && node --test tests/meetings-acceptance.mjs",

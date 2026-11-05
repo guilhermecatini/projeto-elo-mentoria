@@ -2,6 +2,7 @@
 
 | Recurso | Administrador | Mentor | Mentorado |
 |---|---|---|---|
+| Perfil, foto e dados de acesso | Somente próprios; mudanças de acesso exigem reautenticação | Somente próprios; mesmas verificações | Somente próprios; mesmas verificações |
 | Carteira e painel | Organização inteira | Atribuições vigentes | Empresas autorizadas |
 | Cadastro de clientes e atribuições | Gerencia | Consulta sua carteira | Consulta própria empresa |
 | Atendimento público | Intervém | Atende sua carteira | Abre e acompanha próprios assuntos |

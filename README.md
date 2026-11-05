@@ -73,6 +73,7 @@ npm test
 npm audit
 # Com banco/Redis locais ativos: teste isolado de MFA e sessões
 npm run test:security
+npm run test:profile
 npm run test:plans
 npm run test:attachments
 npm run test:meetings
@@ -124,8 +125,12 @@ não substitui a cópia segura e separada dos segredos.
 
 ## Documentação
 
+- [Manual de uso passo a passo](docs/manual-usuario.md): primeiros passos e rotinas por perfil.
+  Também disponível na **Central de ajuda** dentro do sistema, com busca e impressão.
+  A fonte é `apps/web/src/help-content.ts`; use `npm run docs:manual` após atualizá-la.
 - [Arquitetura](docs/arquitetura.md) e [plano de etapas](docs/plano.md).
 - [Modelo de dados](docs/modelo-dados.md) e [permissões](docs/permissoes.md).
+- [Perfil pessoal, fotos e alterações de acesso](docs/perfil-usuario.md).
 - [Estados e prazos](docs/atendimento.md), [API](docs/api.md) e [indicadores](docs/indicadores.md).
 - [Planos, tarefas, evidências e regras de alertas](docs/planos-e-tarefas.md).
 - [Anexos privados, limites e recuperação](docs/anexos-privados.md).

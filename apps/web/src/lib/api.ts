@@ -1,4 +1,4 @@
-export type User = { id: string; name: string; email: string; role: 'admin' | 'mentor' | 'mentee' };
+export type User = { id: string; name: string; email: string; role: 'admin' | 'mentor' | 'mentee'; avatarUrl?: string | null };
 export type Client = { id: string; name: string; contactName?: string; email?: string; enrollmentId: string; programName: string; mentorName?: string; mentorId?: string; status: string; stage: string; startsAt?: string; endsAt: string; lastContactAt?: string; nextStep?: string; nextStepAt?: string; followupDays?: number; attentionReasons: string[] };
 export type Ticket = { id: string; enrollmentId: string; clientId: string; clientName: string; mentorName?: string; subject: string; priority: 'standard' | 'urgent'; status: string; createdAt: string; firstResponseDueAt?: string; nextResponseDueAt?: string; promisedAt?: string; resolutionDueAt?: string; unansweredCount: number; messages?: Message[] };
 export type Message = { id: string; body: string; kind: 'public' | 'internal' | 'automatic' | 'event'; authorId?: string; authorName: string; authorRole: string; createdAt: string; replyToId?: string; answeredAt?: string };
@@ -11,7 +11,7 @@ export class ApiError extends Error { constructor(message: string, public readon
 let csrfToken = '';
 export function setCsrf(value: string) { csrfToken = value; }
 export async function api<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const response = await fetch(`/api${path}`, { ...options, credentials: 'include', headers: { 'Content-Type': 'application/json', ...(csrfToken ? { 'X-CSRF-Token': csrfToken } : {}), ...options.headers } });
+  const response = await fetch(`/api${path}`, { ...options, credentials: 'include', headers: { ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }), ...(csrfToken ? { 'X-CSRF-Token': csrfToken } : {}), ...options.headers } });
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
     const message = body.message || 'Não foi possível concluir. Tente novamente.';
